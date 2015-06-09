@@ -5,37 +5,72 @@ import pygame, sys, math, random
 
 
 ##-----------FUNCTIONS------------------
+def firstgen(mapheight,mapwidth):
+    
+    tilemap[int(mapheight/2)][int(mapwidth/2)] = random.randint(1,255)
+    
+def readhm():
+    image = pygame.image.load("leaves.jpg")
+    
+    colormap = [[0 for r in range(256)] for cl in range(256)]
+    
+    for x in range(256):
+        for y in range(256):
+            color = image.get_at((x,y))
+            colormap[y][x] = color[0]
+            
+    return colormap
+
 
 
 
 pygame.init()
 
-BLUE = 0
-RED  = 1
+WATER = 0
+SAND  = 1
+GRASS = 3
+MOSS  = 4
+ROCK  = 5
 
 tiletextures = {
-                BLUE  : pygame.image.load("blue_dot.png"),
-                RED   : pygame.image.load("red_dot.png")
+                WATER  : pygame.image.load("water.png"),
+                SAND   : pygame.image.load("sand.png"),
+                GRASS  : pygame.image.load("grass.png"),
+                MOSS   : pygame.image.load("heightgrass.png"),
+                ROCK   : pygame.image.load("rock.png")
                 }
 
-tilesize = 32
-mapwidth = 60
-mapheight = 33
+tilesize = 4
+mapwidth = 256
+mapheight = 256
 
-tiles = [BLUE,RED]
-tilemap = [[BLUE for w in range(mapwidth)] for h in range(mapheight)]
+tiles = [WATER,SAND,GRASS,MOSS,ROCK]
+tilemap = readhm()
 
-screen = pygame.display.set_mode((tilesize*mapwidth,tilesize*mapheight),pygame.FULLSCREEN)
+background = pygame.Surface((mapwidth*tilesize,mapwidth*tilesize))
+
+screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 
-for rw in range(mapheight):
-    for cl in range(mapwidth):
-        randnum = random.randint(0,10)
-        if randnum <= 3:
-            tile = RED
+for i in range(256):
+    for j in range(256):
+        if tilemap[i][j] <= 50:
+            tile = WATER
+        elif tilemap[i][j] <= 60:
+            tile = SAND
+        elif tilemap[i][j] <= 160:
+            tile = GRASS
+        elif tilemap[i][j] <= 220:
+            tile = MOSS
         else:
-            tile = BLUE
-        tilemap[rw][cl] = tile
+            tile = ROCK
+        
+        tilemap[i][j] = tile
+
+
+
+
+
 
 mainloop = True
 while mainloop:
@@ -56,6 +91,10 @@ while mainloop:
                 
     for row in range(mapheight):
         for column in range (mapwidth):
-            screen.blit(tiletextures[tilemap[row][column]], (column*tilesize,row*tilesize))
+            background.blit(tiletextures[tilemap[row][column]], (column*tilesize,row*tilesize))
             
+            
+            
+            
+    screen.blit(background,(0,0))
     pygame.display.flip()       
