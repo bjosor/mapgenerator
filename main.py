@@ -21,13 +21,13 @@ def readhm(image):
     # exchange color value for corresponding tile ID
     for i in range(imgwidth):
         for j in range(imgheight):
-            if colormap[i][j] <= 5:
+            if colormap[i][j] <= 50:
                 tile = WATER
-            elif colormap[i][j] <= 30:
+            elif colormap[i][j] <= 70:
                     tile = SAND
-            elif colormap[i][j] <= 100:
+            elif colormap[i][j] <= 160:
                 tile = GRASS
-            elif colormap[i][j] <= 150:
+            elif colormap[i][j] <= 180:
                 tile = MOSS
             else:
                 tile = ROCK
@@ -61,7 +61,7 @@ MOSS  = 4
 ROCK  = 5
 SANDGRASS = 6
 
-image = pygame.image.load("erosion.jpg")
+image = pygame.image.load("Heightmap.png")
 
 tiletextures = {
                 WATER  : pygame.image.load("water.png"),
@@ -72,7 +72,7 @@ tiletextures = {
                 SANDGRASS:pygame.image.load("grass_sand.png")
                 }
 
-tilesize = 32
+tilesize = 8
 mapwidth = image.get_width()
 mapheight = image.get_height()
 
