@@ -1,4 +1,4 @@
-import pygame, sys, math, random
+import pygame, sys, math, random, Diamondsquaregen
 
 ##-----------CLASSES--------------------
         
@@ -21,13 +21,13 @@ def readhm(image):
     # exchange color value for corresponding tile ID
     for i in range(imgwidth):
         for j in range(imgheight):
-            if colormap[i][j] <= 50:
+            if colormap[i][j] <= 125:
                 tile = WATER
-            elif colormap[i][j] <= 70:
+            elif colormap[i][j] <= 255:
                     tile = SAND
-            elif colormap[i][j] <= 160:
+            elif colormap[i][j] <= 255:
                 tile = GRASS
-            elif colormap[i][j] <= 180:
+            elif colormap[i][j] <= 255:
                 tile = MOSS
             else:
                 tile = ROCK
@@ -35,9 +35,9 @@ def readhm(image):
             colormap[i][j] = tile
     
     for x in range(1,imgwidth-1):
-        print(x)
+        #print(x)
         for y in range(1,imgheight-1):
-            print(y)
+            #print(y)
             relations = check_neighbour(colormap,x,y)
             if colormap[x][y] == SAND and relations.count(GRASS) == 2:
                     colormap[x][y] = SANDGRASS
@@ -61,20 +61,25 @@ MOSS  = 4
 ROCK  = 5
 SANDGRASS = 6
 
-image = pygame.image.load("Heightmap.png")
+bob = random.randint(1,100)
+print(bob)
+
+image = Diamondsquaregen.paint(bob,bob,512,512,5)
 
 tiletextures = {
-                WATER  : pygame.image.load("water.png"),
-                SAND   : pygame.image.load("sand32px.png"),
-                GRASS  : pygame.image.load("grass32px.png"),
-                MOSS   : pygame.image.load("heightgrass.png"),
-                ROCK   : pygame.image.load("rock.png"),
-                SANDGRASS:pygame.image.load("grass_sand.png")
+                WATER  : pygame.image.load("graphics/water.png"),
+                SAND   : pygame.image.load("graphics/sand32px.png"),
+                GRASS  : pygame.image.load("graphics/grass32px.png"),
+                MOSS   : pygame.image.load("graphics/heightgrass.png"),
+                ROCK   : pygame.image.load("graphics/rock.png"),
+                SANDGRASS:pygame.image.load("graphics/grass_sand.png")
                 }
 
-tilesize = 8
+tilesize = 4
 mapwidth = image.get_width()
 mapheight = image.get_height()
+
+
 
 #--scrolling configuration----
 scrollstepx = 15
@@ -87,7 +92,7 @@ tilemap = readhm(image)
 #----surfaces and clock-----
 clock = pygame.time.Clock()
 worldmap = pygame.Surface((mapwidth*tilesize,mapwidth*tilesize))
-screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+screen = pygame.display.set_mode((1024,512))
 mapdim = worldmap.get_size()
 screensize = screen.get_size()
 background = pygame.Surface(screen.get_size())

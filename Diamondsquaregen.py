@@ -2,9 +2,6 @@ import pygame, random, math
 
 pygame.init()
 
-screen = (50,50)
-window = pygame.display.set_mode([screen[0],screen[1]])
-surface = pygame.Surface([screen[0],screen[1]])
 
 def diamondsquaredmap(x,y,width,height,iterations):
     dsmap = fieldDiamondSquared(x, y, x+width, y+height, iterations)
@@ -12,10 +9,10 @@ def diamondsquaredmap(x,y,width,height,iterations):
      
     for j in range(width):
         for k in range(height): 
-            map[j][k] = map[j][k] / maxdeviation
-            map[j][k] = (map[j][k] + 1) / 2
+            dsmap[j][k] = dsmap[j][k] / maxdeviation
+            dsmap[j][k] = (dsmap[j][k] + 1) / 2
             
-    return map
+    return dsmap
 
 def create2DArray(d1, d2):
         x = [[0 for i in range(d1)] for j in range(d2)]  
@@ -34,11 +31,11 @@ def fieldDiamondSquared(x0, y0, x1, y1, iterations):
 
             return finalmap;
         
-        ux0 = math.floor(x0 / 2) - 1;
-        uy0 = math.floor(y0 / 2) - 1;
-        ux1 = math.ceil(x1 / 2) + 1;
-        uy1 = math.ceil(y1 / 2) + 1;
-        uppermap = fieldDiamondSquared(ux0, uy0, ux1, uy1, iterations-1);
+        ux0 = math.floor(x0 / 2) - 1
+        uy0 = math.floor(y0 / 2) - 1
+        ux1 = math.ceil(x1 / 2) + 1
+        uy1 = math.ceil(y1 / 2) + 1
+        uppermap = fieldDiamondSquared(ux0, uy0, ux1, uy1, iterations-1)
 
         uw = ux1 - ux0
         uh = uy1 - uy0
@@ -46,9 +43,9 @@ def fieldDiamondSquared(x0, y0, x1, y1, iterations):
         cx0 = ux0 * 2
         cy0 = uy0 * 2
 
-        cw = uw*2-1;
-        ch = uh*2-1;
-        currentmap = create2DArray(cw,ch);
+        cw = uw*2-1
+        ch = uh*2-1
+        currentmap = create2DArray(cw,ch)
         
 
         for j in range(uw):
@@ -93,41 +90,65 @@ def getMaxDeviation(iterations):
 
     #This function returns the same result for given values but should be somewhat random.
 def PRH(iterations,x,y):
-        var hash;
-        x &= 0xFFF;
-        y &= 0xFFF;
-        iterations &= 0xFF;
-        hash = (iterations << 24);
-        hash |= (y << 12);
-        hash |= x;
-        var rem = hash & 3;
-        var h = hash;
+    #print("hashing stuff")
+    x = x & 0xFFF
+    y = y & 0xFFF
+    iterations & 0xFF
+    hash = (iterations << 24)
+    hash = hash|(y << 12)
+    hash = hash| x
+    rem = hash & 3
+    h = hash
+    print(rem)
 
-        switch (rem) {
-            case 3:
-                hash += h;
-                hash ^= hash << 32;
-                hash ^= h << 36;
-                hash += hash >> 22;
-                break;
-            case 2:
-                hash += h;
-                hash ^= hash << 22;
-                hash += hash >> 34;
-                break;
-            case 1:
-                hash += h;
-                hash ^= hash << 20;
-                hash += hash >> 2;
-        }
-        hash ^= hash << 6;
-        hash += hash >> 10;
-        hash ^= hash << 8;
-        hash += hash >> 34;
-        hash ^= hash << 50;
-        hash += hash >> 12;
+    if rem == 3:
+        hash += h
+        hash = hash ^ hash << 32
+        hash = hash ^ h << 36
+        hash += hash >> 22
+        print("hash 3")
+                
+    elif rem == 2:
+        hash += h
+        hash = hash ^ hash << 22
+        hash += hash >> 34
+        print("hash 2")
+                
+    elif rem == 1:
+        hash += h
+        hash ^= hash << 20
+        hash += hash >> 2
+        print("hash 1")
+                
+    hash = hash ^ hash << 6
+    hash += hash >> 10
+    hash = hash ^ hash << 8
+    hash += hash >> 34
+    hash = hash ^ hash << 50
+    hash += hash >> 12
         
-        return (hash & 0xFFFF) / 0xFFFF;
-    }
-    
-};
+    return (hash & 0xFFFF) / 0xFFFF
+
+def paint(seedx,seedy,width,height,iterations):
+    dsmap = diamondsquaredmap(seedx, seedy, width, height, iterations)
+    surface = pygame.Surface((width,height))
+    for j in range(len(dsmap)):
+        for k in range(len(dsmap[1])):
+            color = abs(math.floor(dsmap[j][k]*250))
+            if color > 255:
+                color = 255
+            #print(color)
+
+            surface.set_at((j,k),(color,color,color))
+    return surface
+
+#screen = pygame.display.set_mode((512,512))
+#background = paint(512,512,5)
+             
+#while True:
+#    screen.blit(background,(0,0))
+#    pygame.display.flip()
+
+
+
+
