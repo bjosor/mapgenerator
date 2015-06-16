@@ -23,24 +23,30 @@ def readhm(image):
         for j in range(imgheight):
             if colormap[i][j] <= 125:
                 tile = WATER
-            elif colormap[i][j] <= 255:
+            elif colormap[i][j] <= 100:
                     tile = SAND
             elif colormap[i][j] <= 255:
                 tile = GRASS
-            elif colormap[i][j] <= 255:
+            elif colormap[i][j] <= 200:
                 tile = MOSS
             else:
                 tile = ROCK
         
             colormap[i][j] = tile
+            
+    colormap = fill(imgwidth,imgheight,colormap)
+
     
+    return colormap
+    
+def fill(imgwidth,imgheight,colormap):    
     for x in range(1,imgwidth-1):
         #print(x)
         for y in range(1,imgheight-1):
             #print(y)
             relations = check_neighbour(colormap,x,y)
-            if colormap[x][y] == SAND and relations.count(GRASS) == 2:
-                    colormap[x][y] = SANDGRASS
+            if colormap[x][y] == WATER and relations.count(GRASS) == 4:
+                    colormap[x][y] = GRASS
             
     return colormap
 
@@ -61,10 +67,10 @@ MOSS  = 4
 ROCK  = 5
 SANDGRASS = 6
 
-bob = random.randint(1,100)
+bob = random.randint(1,100000)
 print(bob)
 
-image = Diamondsquaregen.paint(bob,bob,512,512,5)
+image = Diamondsquaregen.paint(bob,bob,256,256,5)
 
 tiletextures = {
                 WATER  : pygame.image.load("graphics/water.png"),
@@ -75,7 +81,7 @@ tiletextures = {
                 SANDGRASS:pygame.image.load("graphics/grass_sand.png")
                 }
 
-tilesize = 4
+tilesize = 64
 mapwidth = image.get_width()
 mapheight = image.get_height()
 
@@ -91,8 +97,8 @@ tilemap = readhm(image)
 
 #----surfaces and clock-----
 clock = pygame.time.Clock()
-worldmap = pygame.Surface((mapwidth*tilesize,mapwidth*tilesize))
-screen = pygame.display.set_mode((1024,512))
+worldmap = pygame.Surface((mapwidth*tilesize-1,mapwidth*tilesize-1))
+screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
 mapdim = worldmap.get_size()
 screensize = screen.get_size()
 background = pygame.Surface(screen.get_size())
@@ -102,6 +108,8 @@ background = worldmap.subsurface((cornerpoint[0],cornerpoint[1],mapdim[0],mapdim
 for row in range(mapwidth):
         for column in range (mapheight):
             worldmap.blit(tiletextures[tilemap[column][row]], (column*tilesize,row*tilesize))
+            
+worldmap.convert()
 
 
 

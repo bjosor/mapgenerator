@@ -28,7 +28,7 @@ def fieldDiamondSquared(x0, y0, x1, y1, iterations):
             for j in range(finalwidth):
                 for k in range(finalheight):
                     finalmap[j][k] =  displace(iterations,x0+j,y0+k) 
-
+            print("last finalmap returned")            
             return finalmap;
         
         ux0 = math.floor(x0 / 2) - 1
@@ -73,7 +73,7 @@ def fieldDiamondSquared(x0, y0, x1, y1, iterations):
                 finalmap[j][k] = currentmap[j+xoff][k+yoff]
             
         
-        
+        print("finalmap returned")
         return finalmap
     
 
@@ -86,48 +86,46 @@ def getMaxDeviation(iterations):
     dev = 0.5 / (iterations+1)
     if iterations <= 0: 
         return dev
+    print("maxdev gotten", (getMaxDeviation(iterations-1) + dev))
     return getMaxDeviation(iterations-1) + dev
 
     #This function returns the same result for given values but should be somewhat random.
 def PRH(iterations,x,y):
-    #print("hashing stuff")
+    #print("hashhing stuff")
     x = x & 0xFFF
     y = y & 0xFFF
     iterations & 0xFF
-    hash = (iterations << 24)
-    hash = hash|(y << 12)
-    hash = hash| x
-    rem = hash & 3
-    h = hash
-    print(rem)
+    hashh = (iterations << 24)
+    hashh = hashh|(y << 12)
+    hashh = hashh| x
+    rem = hashh & 3
+    h = hashh
 
     if rem == 3:
-        hash += h
-        hash = hash ^ hash << 32
-        hash = hash ^ h << 36
-        hash += hash >> 22
-        print("hash 3")
+        hashh += h
+        hashh = hashh ^ hashh << 32
+        hashh = hashh ^ h << 36
+        hashh += hashh >> 22
                 
     elif rem == 2:
-        hash += h
-        hash = hash ^ hash << 22
-        hash += hash >> 34
-        print("hash 2")
+        hashh += h
+        hashh = hashh ^ hashh << 22
+        hashh += hashh >> 34
                 
     elif rem == 1:
-        hash += h
-        hash ^= hash << 20
-        hash += hash >> 2
-        print("hash 1")
+        hashh += h
+        hashh ^= hashh << 20
+        hashh += hashh >> 2
                 
-    hash = hash ^ hash << 6
-    hash += hash >> 10
-    hash = hash ^ hash << 8
-    hash += hash >> 34
-    hash = hash ^ hash << 50
-    hash += hash >> 12
+    hashh = hashh ^ hashh << 6
+    hashh += hashh >> 10
+    hashh = hashh ^ hashh << 8
+    hashh += hashh >> 34
+    hashh = hashh ^ hashh << 50
+    hashh += hashh >> 12
         
-    return (hash & 0xFFFF) / 0xFFFF
+    #print((hashh & 0xFFFF) / 0xFFFF)
+    return (hashh & 0xFFFF) / 0xFFFF
 
 def paint(seedx,seedy,width,height,iterations):
     dsmap = diamondsquaredmap(seedx, seedy, width, height, iterations)
@@ -137,6 +135,9 @@ def paint(seedx,seedy,width,height,iterations):
             color = abs(math.floor(dsmap[j][k]*250))
             if color > 255:
                 color = 255
+            color -= 10
+            if color < 0:
+                color = 0
             #print(color)
 
             surface.set_at((j,k),(color,color,color))

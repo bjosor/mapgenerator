@@ -90,7 +90,7 @@ def noise(x,y,z):
                               grad(p[BB+1],x-1,y-1,z-1))))
 
 def Generate():
-    octaves = 8
+    octaves = 4
     persistence = 0.8
     
     amplitude = 1.0
@@ -103,7 +103,7 @@ def Generate():
     for x in range(Screen):
         for y in range(Screen):
             sc = float(Screen)/tilesize
-            frequency = 1.0
+            frequency = 0.5
             amplitude = 1.0
             color = 0.0
             for octave in range(octaves):
