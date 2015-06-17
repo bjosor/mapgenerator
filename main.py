@@ -2,7 +2,33 @@ import pygame, sys, math, random, Diamondsquaregen
 
 ##-----------CLASSES--------------------
         
-
+class spritesheet(object):
+    def __init__(self, filename):
+        try:
+            self.sheet = pygame.image.load(filename).convert()
+        except pygame.error:
+            print ('Unable to load spritesheet image:')
+    # Load a specific image from a specific rectangle
+    def image_at(self, rectangle, colorkey = None):
+        "Loads image from x,y,x+offset,y+offset"
+        rect = pygame.Rect(rectangle)
+        image = pygame.Surface(rect.size).convert()
+        image.blit(self.sheet, (0, 0), rect)
+        if colorkey is not None:
+            if colorkey is -1:
+                colorkey = image.get_at((0,0))
+            image.set_colorkey(colorkey, pygame.RLEACCEL)
+        return image
+    # Load a whole bunch of images and return them as a list
+    def images_at(self, rects, colorkey = None):
+        "Loads multiple images, supply a list of coordinates" 
+        return [self.image_at(rect, colorkey) for rect in rects]
+    # Load a whole strip of images
+    def load_strip(self, rect, image_count, colorkey = None):
+        "Loads a strip of images and returns them as a list"
+        tups = [(rect[0]+rect[2]*x, rect[1], rect[2], rect[3])
+                for x in range(image_count)]
+        return self.images_at(tups, colorkey)
 
 ##-----------FUNCTIONS------------------
     
@@ -34,31 +60,37 @@ def readhm(image):
         
             colormap[i][j] = tile
             
-    colormap = fill(imgwidth,imgheight,colormap)
-
-    
-    return colormap
-    
-def fill(imgwidth,imgheight,colormap):    
-    for x in range(1,imgwidth-1):
-        #print(x)
-        for y in range(1,imgheight-1):
-            #print(y)
-            relations = check_neighbour(colormap,x,y)
-            if colormap[x][y] == WATER and relations.count(GRASS) == 4:
-                    colormap[x][y] = GRASS
             
     return colormap
 
 
-def check_neighbour(array,x,y):
-    neighbours = [array[x+1][y],array[x][y+1],array[x-1][y],array[x][y-1]]
-    return neighbours
+def check_neighbor(array,x,y,tile):
+    binary = 0
+    neighbors = [array[x+1][y],array[x][y+1],array[x-1][y],array[x][y-1]]
+    for a in neighbors:
+        if a == tile:
+            index = neighbors.index(a)
+            if index == 0:
+                binary += 1
+            elif index == 1:
+                binary += 2
+            elif index == 2:
+                binary += 4
+            elif index == 3:
+                binary += 8
+    return binary
 
+def generatetransitions(maparray):
+    for a in maparray:
+        for b in maparray[0]:
+            tile = check_neighbor(maparray,a,b,maparray[a][b])
+            
 
 #-----------MAIN BLOCK--------------
 
 pygame.init()
+
+screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
 
 WATER = 0
 SAND  = 1
@@ -67,21 +99,23 @@ MOSS  = 4
 ROCK  = 5
 SANDGRASS = 6
 
-bob = random.randint(1,100000)
+bob = random.randint(1,1000000)
 print(bob)
 
-image = Diamondsquaregen.paint(bob,bob,256,256,5)
+image = Diamondsquaregen.paint(bob,bob,128,128,5).convert()
 
 tiletextures = {
-                WATER  : pygame.image.load("graphics/water.png"),
-                SAND   : pygame.image.load("graphics/sand32px.png"),
-                GRASS  : pygame.image.load("graphics/grass32px.png"),
-                MOSS   : pygame.image.load("graphics/heightgrass.png"),
-                ROCK   : pygame.image.load("graphics/rock.png"),
-                SANDGRASS:pygame.image.load("graphics/grass_sand.png")
+                WATER       : pygame.image.load("graphics/water.png"),
+                SAND        : pygame.image.load("graphics/sand32px.png"),
+                GRASS       : spritesheet("graphics/grass32px.png"),
+                MOSS        : pygame.image.load("graphics/heightgrass.png"),
+                ROCK        : pygame.image.load("graphics/rock.png"),
+                SANDGRASS   : pygame.image.load("graphics/grass_sand.png")
                 }
 
-tilesize = 64
+tiletextures[GRASS].load_strip((0,0,16,16),18,(255,255,255))
+
+tilesize = 32
 mapwidth = image.get_width()
 mapheight = image.get_height()
 
@@ -97,8 +131,7 @@ tilemap = readhm(image)
 
 #----surfaces and clock-----
 clock = pygame.time.Clock()
-worldmap = pygame.Surface((mapwidth*tilesize-1,mapwidth*tilesize-1))
-screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
+worldmap = pygame.Surface((mapwidth*tilesize,mapwidth*tilesize))
 mapdim = worldmap.get_size()
 screensize = screen.get_size()
 background = pygame.Surface(screen.get_size())
