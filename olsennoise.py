@@ -4,37 +4,37 @@
 
 def fieldOlsenNoise(x0, y0, x1, y1, iterations):
 
-    function singlehash(hash) {
-        var rem = hash & 3;
-        var h = hash;
+def singlehash(hash)
+    rem = hash & 3;
+    h = hash
 
-        switch (rem) {
-            case 3:
-                hash += h;
-                hash ^= hash << 32;
-                hash ^= h << 36;
-                hash += hash >> 22;
-                break;
-            case 2:
-                hash += h;
-                hash ^= hash << 22;
-                hash += hash >> 34;
-                break;
-            case 1:
-                hash += h;
-                hash ^= hash << 20;
-                hash += hash >> 2;
+    switch (rem) {
+        case 3:
+            hash += h;
+            hash ^= hash << 32;
+            hash ^= h << 36;
+            hash += hash >> 22;
+            break;
+        case 2:
+            hash += h;
+            hash ^= hash << 22;
+            hash += hash >> 34;
+            break;
+        case 1:
+            hash += h;
+            hash ^= hash << 20;
+            hash += hash >> 2;
         }
-        hash ^= hash << 6;
-        hash += hash >> 10;
-        hash ^= hash << 8;
-        hash += hash >> 34;
-        hash ^= hash << 50;
-        hash += hash >> 12;
-        return hash & 0xFFFF;
+    hash ^= hash << 6;
+    hash += hash >> 10;
+    hash ^= hash << 8;
+    hash += hash >> 34;
+    hash ^= hash << 50;
+    hash += hash >> 12;
+    return hash & 0xFFFF;
     } //provides a hash of a given value.
 
-    var hashrandom = function () {
+    hashrandom = function () {
         var hash = singlehash(arguments[0]);
         for (var a = 1; a < arguments.length; a++) {
             hash = singlehash(hash ^ arguments[a]);

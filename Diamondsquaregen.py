@@ -28,7 +28,7 @@ def fieldDiamondSquared(x0, y0, x1, y1, iterations):
             for j in range(finalwidth):
                 for k in range(finalheight):
                     finalmap[j][k] =  displace(iterations,x0+j,y0+k) 
-            print("last finalmap returned")            
+            #print("last finalmap returned")            
             return finalmap;
         
         ux0 = math.floor(x0 / 2) - 1
@@ -73,7 +73,7 @@ def fieldDiamondSquared(x0, y0, x1, y1, iterations):
                 finalmap[j][k] = currentmap[j+xoff][k+yoff]
             
         
-        print("finalmap returned")
+        #print("finalmap returned")
         return finalmap
     
 
@@ -86,7 +86,7 @@ def getMaxDeviation(iterations):
     dev = 0.5 / (iterations+1)
     if iterations <= 0: 
         return dev
-    print("maxdev gotten", (getMaxDeviation(iterations-1) + dev))
+    #print("maxdev gotten", (getMaxDeviation(iterations-1) + dev))
     return getMaxDeviation(iterations-1) + dev
 
     #This function returns the same result for given values but should be somewhat random.
