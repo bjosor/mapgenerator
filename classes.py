@@ -1,4 +1,4 @@
-import pygame, math, sys, random
+import pygame, math
 
 class Ball(pygame.sprite.Sprite):
     selected = []
@@ -55,8 +55,8 @@ class Ball(pygame.sprite.Sprite):
 
 
 class config(object):
-    screensize = (800,600)
-    mapsize = (128,128)
+    screensize = (1920,1080)
+    mapsize = (1024,1024)
     tilesize = 64
     fps = 30
     scrollstepx = 1

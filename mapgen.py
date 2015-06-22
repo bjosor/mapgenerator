@@ -51,8 +51,10 @@ def readhm(image):
         for j in range(imgheight):
             if colormap[i][j] <= 125:
                 tile = 0
-            elif colormap[i][j] <= 255:
+            elif colormap[i][j] <= 190:
                 tile = 1
+            elif colormap[i][j] <= 255:
+                tile = 2
         
             colormap[i][j] = {"tileval":tile}
             
@@ -87,13 +89,30 @@ def check_neighbor(array,x,y,tile):
                 print(binary)
     return binary
 
+def generate_minimap(tilemap,mapsize):
+    minimap = pygame.Surface(mapsize).convert()
+    for a in range(mapsize[0]):
+        for b in range(mapsize[1]):
+            if tilemap[a][b]["tileval"] == 0:
+                minimap.set_at((a,b),(96,104,202))
+            if tilemap[a][b]["tileval"] == 1:
+                minimap.set_at((a,b),(126,184,92))
+            if tilemap[a][b]["tileval"] == 2:
+                minimap.set_at((a,b),(150,150,150))
+                
+    minimap = pygame.transform.scale(minimap, (300,300))
+    
+    return minimap
+            
+
 
 def generate_map(seed,mapsize):   
     image = Diamondsquaregen.paint(seed,seed,mapsize[0],mapsize[1],5).convert()
     
     tilemap = readhm(image)
+    minimap = generate_minimap(tilemap,mapsize)
     
-    return tilemap
+    return tilemap,minimap
 
     
 
