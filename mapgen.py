@@ -54,7 +54,7 @@ def readhm(image):
             elif colormap[i][j] <= 255:
                 tile = 1
         
-            colormap[i][j] = tile
+            colormap[i][j] = {"tileval":tile}
             
             
     return colormap
@@ -88,159 +88,12 @@ def check_neighbor(array,x,y,tile):
     return binary
 
 
-def generate_map(randseed,mapsize):   
-    image = Diamondsquaregen.paint(randseed,randseed,mapsize[0],mapsize[1],5).convert()
+def generate_map(seed,mapsize):   
+    image = Diamondsquaregen.paint(seed,seed,mapsize[0],mapsize[1],5).convert()
     
-    tilesize = 64
-    mapwidth = image.get_width()
-    mapheight = image.get_height()
-    
-    WATER = "water"
-    GRASS = "water"
-    water = spritesheet("graphics/water.png")
-    grass = spritesheet("graphics/grass.png")
-    tiletextures = [water.load_strip((0,0,64,64),18,(255,255,255)),grass.load_strip((0,0,64,64),18,(255,255,255))]    
-    
-    tiles = [WATER,GRASS]
     tilemap = readhm(image)
-
-    worldmap = pygame.Surface((mapwidth*tilesize,mapwidth*tilesize)) 
     
-    #loop through all tiles except bordertiles
-    for row in range(mapwidth)[1:-1]:
-        for column in range (mapheight)[1:-1]:
-            bitval = check_neighbor(tilemap,row,column,WATER)
-            worldmap.blit(tiletextures[tilemap[row][column]][0], (column*tilesize,row*tilesize))
-            #print (bitval)
-            if bitval != 0:
-                print ("kake")
-                #worldmap.blit(tiletextures[tilemap[column][row]][bitval],(column*tilesize,row*tilesize))
-                #worldmap.blit(sand,(column*tilesize,row*tilesize))
-                
-    return worldmap
-            
+    return tilemap
 
-#-----------MAIN BLOCK--------------
-
-"""pygame.init()
-
-screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
-
-WATER = 0
-GRASS = 1
-water = spritesheet("graphics/water.png")
-grass = spritesheet("graphics/grass.png")
-bob = random.randint(1,1000000)
-print(bob)
-
-image = Diamondsquaregen.paint(bob,bob,128,128,5).convert()
-
-tiletextures = [water.load_strip((0,0,64,64),18,(255,255,255)),grass.load_strip((0,0,64,64),18,(255,255,255))]
-
-
-tilesize = 64
-mapwidth = image.get_width()
-mapheight = image.get_height()
-
-sand = pygame.image.load("graphics/sand.png")
-
-#--scrolling configuration----
-scrollstepx = 15
-scrollstepy = 15
-cornerpoint = [0,0]
-
-tiles = [WATER,GRASS]
-tilemap = readhm(image)
-
-#----surfaces and clock-----
-clock = pygame.time.Clock()
-worldmap = pygame.Surface((mapwidth*tilesize,mapwidth*tilesize))
-mapdim = worldmap.get_size()
-screensize = screen.get_size()
-background = pygame.Surface(screen.get_size())
-backgroundrect = background.get_rect()
-background = worldmap.subsurface((cornerpoint[0],cornerpoint[1],mapdim[0],mapdim[1]))
-
-
-#loop through all tiles except bordertiles
-for row in range(mapwidth)[1:-1]:
-        for column in range (mapheight)[1:-1]:
-            bitval = check_neighbor(tilemap,row,column,WATER)
-            worldmap.blit(tiletextures[tilemap[row][column]][0], (column*tilesize,row*tilesize))
-            #print (bitval)
-            if bitval != 0:
-                print ("kake")
-                #worldmap.blit(tiletextures[tilemap[column][row]][bitval],(column*tilesize,row*tilesize))
-                #worldmap.blit(sand,(column*tilesize,row*tilesize))
-                
-            
-worldmap.convert()
-
-
-
-
-
-mainloop = True
-while mainloop:
-    pygame.display.set_caption('fps:%f'%clock.get_fps())
-    clock.tick(60)
-
-    #event loop
-    for event in pygame.event.get():
-        ##print(event)
-        if event.type==pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                mainloop=False
-                pygame.quit()
-                sys.exit()
-                
     
-                
-    scrollx = 0
-    scrolly = 0
-    pressedkeys = pygame.key.get_pressed()
-                 
-    # --- handle keys to scroll map ----
-    if pressedkeys[pygame.K_LEFT]:
-        scrollx -= scrollstepx
-    if pressedkeys[pygame.K_RIGHT]:
-        scrollx += scrollstepx
-    if pressedkeys[pygame.K_UP]:
-        scrolly -= scrollstepy
-    if pressedkeys[pygame.K_DOWN]:
-        scrolly += scrollstepy
-    # -------- scroll the visible part of the map ------
-    cornerpoint[0] += scrollx
-    cornerpoint[1] += scrolly
 
-    if cornerpoint[0] < 0:
-            cornerpoint[0] = 0
-            scrollx = 0
-    elif cornerpoint[0] > mapdim[0] - screensize[0]:
-            cornerpoint[0] = mapdim[0] - screensize[0]
-            scrollx = 0
-    if cornerpoint[1] < 0:
-            cornerpoint[1] = 0
-            scrolly = 0
-    elif cornerpoint[1] > mapdim[1] - screensize[1]:
-            cornerpoint[1] = mapdim[1] - screensize[1]
-            scrolly = 0
-
-
-    else:
-        background = worldmap.subsurface((cornerpoint[0],
-                                            cornerpoint[1],
-                                            screensize[0],
-                                            screensize[1])) # take snapshot of bigmap
-                
-    
-            
-            
-            
-            
-    screen.blit(background,(0,0))
-    pygame.display.flip()
-    """       

@@ -1,19 +1,5 @@
 import pygame, math, sys, random
 
-
-class config(object):
-    width = 800
-    height = 600
-    xtiles = 15
-    ytiles = 15
-    fps = 30
-    scrollstepx = 15
-    scrollstepy = 15
-    cornerpoint = [0,0]
-    zoomspeed = 0.01
-    zoom = 1.0
-
-
 class Ball(pygame.sprite.Sprite):
     selected = []
     img = [pygame.image.load('graphics/blue_dot.png'),pygame.image.load('graphics/blue_dot_sel.png'),
@@ -65,12 +51,62 @@ class Ball(pygame.sprite.Sprite):
                 print(Ball.selected)
 
 
+
+
+
+class config(object):
+    screensize = (800,600)
+    mapsize = (128,128)
+    tilesize = 64
+    fps = 30
+    scrollstepx = 1
+    scrollstepy = 1
+    cornerpoint = [0,0]
+    zoomspeed = 0.01
+    zoom = 1.0
+
+class spritesheet(object):
+    # class to read/handle spritesheets, use images_at or load_strip
+    # to load several images from a sheet
+    def __init__(self, filename):
+        try:
+            self.sheet = pygame.image.load(filename).convert()
+        except pygame.error:
+            print ('Unable to load spritesheet image:')
+    # Load a specific image from a specific rectangle
+    def image_at(self, rectangle, colorkey = None):
+        "Loads image from x,y,x+offset,y+offset"
+        rect = pygame.Rect(rectangle)
+        image = pygame.Surface(rect.size).convert()
+        image.blit(self.sheet, (0, 0), rect)
+        if colorkey is not None:
+            if colorkey is -1:
+                colorkey = image.get_at((0,0))
+            image.set_colorkey(colorkey, pygame.RLEACCEL)
+        return image
+    # Load a whole bunch of images and return them as a list
+    def images_at(self, rects, colorkey = None):
+        "Loads multiple images, supply a list of coordinates" 
+        return [self.image_at(rect, colorkey) for rect in rects]
+    # Load a whole strip of images
+    def load_strip(self, rect, image_count, colorkey = None):
+        "Loads a strip of images and returns them as a list"
+        tups = [(rect[0]+rect[2]*x, rect[1], rect[2], rect[3])
+                for x in range(image_count)]
+        return self.images_at(tups, colorkey)
+
+class tiledata(object):
+    def __init__(self,data):
+        self.data = data
+
+class Town(object):
+    stuff = "placeholder"  
+
 ##Class to keep track of units created
 class Unitorg(object):
 
     units = []
     
-class Town(object):
-    stuff = "placeholder"    
+  
     
 
