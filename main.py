@@ -14,15 +14,7 @@ def drawmap(tilearray,surface,focus):
         x += 1
         for b in range(focus[1],focus[1]+int(config.screensize[1]/64)+2):
             y += 1
-            try:
-                if tilearray[a][b]["tileval"] == 0:
-                    surface.blit(tiletextures[0][0],(x*64,y*64))
-                elif tilearray[a][b]["tileval"] == 1:
-                    surface.blit(tiletextures[1][0],(x*64,y*64))
-                elif tilearray[a][b]["tileval"] == 2:
-                    surface.blit(tiletextures[2][0],(x*64,y*64))
-            except:
-                pass
+            surface.blit(tiletextures[tilearray[a][b]["tileval"]][tilearray[a][b]["tilevar"]],(x*64,y*64))
                 
     return surface
             
@@ -71,8 +63,13 @@ tiletextures = [water.load_strip((0,0,64,64),18,(255,255,255)),grass.load_strip(
 terrain = pygame.Surface((config.screensize[0]+128,config.screensize[1]+128))
 
 clock = pygame.time.Clock()
+startpos = (random.randint(1,config.mapsize[0]),random.randint(1,config.mapsize[1]))
 
 config.cornerpoint = [0,0]
+
+allgroup = pygame.sprite.Group()
+
+#villager = commonfolk(startpos,allgroup)
 
 
 
@@ -99,7 +96,7 @@ while mainloop:
             for i in Unitorg.units:
                 i.selection()
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
-            for i in Ball.selected:
+            for i in commonfolk.selected:
                 i.target = pygame.mouse.get_pos()
                 
 
@@ -113,10 +110,10 @@ while mainloop:
     scroll()
     terrain = drawmap(themap,terrain,config.cornerpoint)
     update_minimap(minimap,minimapcopy)
-    #updates the screen
+    allgroup.clear(screen, terrain)
     screen.blit(terrain,(-64,-64))
     screen.blit(minimap,(0,0))
-    #sprites.clear(screen, background)
+    
     pygame.display.flip()
 
 

@@ -55,8 +55,10 @@ def readhm(image):
                 tile = 1
             elif colormap[i][j] <= 255:
                 tile = 2
-        
+                
+            
             colormap[i][j] = {"tileval":tile}
+        
             
             
     return colormap
@@ -65,28 +67,31 @@ def readhm(image):
 def check_neighbor(array,x,y,tile):
     # Creates a unique value for a tile depending on its neighbours
     binary = 0
-    if array[x][y] == tile:
-        neighbors = [array[x][y+1],array[x+1][y+1],array[x+1][y],array[x+1][y-1],array[x][y-1],array[x-1][y-1],array[x-1][y],array[x-1][y+1]]
-        for index, a in enumerate(neighbors):
-            if a == 1:
-                if index == 0:
-                    binary += 1
-                elif index == 1:
-                    binary += 2
-                elif index == 2:
-                    binary += 4
-                elif index == 3:
-                    binary += 8
-                elif index == 4:
-                    binary += 16
-                elif index == 5:
-                    binary += 32
-                elif index == 6:
-                    binary += 64
-                elif index == 7:
-                    binary += 128
+    #print(x,y)
+    if x >= 1 and x <= len(array)-2 and y >= 1 and y <= len(array[0])-2:
+        if array[x][y]["tileval"] == tile:
+            neighbors = [array[x][y+1],array[x+1][y+1],array[x+1][y],array[x+1][y-1],array[x][y-1],array[x-1][y-1],array[x-1][y],array[x-1][y+1]]
+            for index, a in enumerate(neighbors):
+                if a["tileval"] != tile:
+                    #print("a and tile",a,tile)
+                    if index == 0:
+                        binary += 1
+                    elif index == 1:
+                        binary += 2
+                    elif index == 2:
+                        binary += 4
+                    elif index == 3:
+                        binary += 8
+                    elif index == 4:
+                        binary += 16
+                    elif index == 5:
+                        binary += 32
+                    elif index == 6:
+                        binary += 64
+                    elif index == 7:
+                        binary += 128
                 
-                print(binary)
+            print(binary)
     return binary
 
 def generate_minimap(tilemap,mapsize):
@@ -100,7 +105,7 @@ def generate_minimap(tilemap,mapsize):
             if tilemap[a][b]["tileval"] == 2:
                 minimap.set_at((a,b),(150,150,150))
                 
-    minimap = pygame.transform.scale(minimap, (300,300))
+    #minimap = pygame.transform.scale(minimap, (300,300))
     
     return minimap
             
@@ -111,6 +116,10 @@ def generate_map(seed,mapsize):
     
     tilemap = readhm(image)
     minimap = generate_minimap(tilemap,mapsize)
+    for a in range(len(tilemap)):
+        for b in range(len(tilemap[0])):
+            variation = check_neighbor(tilemap,a,b,tilemap[a][b]["tileval"])
+            tilemap[a][b]["tilevar"] = variation
     
     return tilemap,minimap
 

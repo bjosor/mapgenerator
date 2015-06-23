@@ -1,17 +1,21 @@
 import pygame, math
 
-class Ball(pygame.sprite.Sprite):
+class commonfolk(pygame.sprite.Sprite):
+    m_objectlist = []
     selected = []
-    img = [pygame.image.load('graphics/blue_dot.png'),pygame.image.load('graphics/blue_dot_sel.png'),
-           pygame.image.load('graphics/red_dot.png')]
-
     ## Contains the base information of the instance
-    def __init__(self,posx,posy):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = Ball.img[0]
+    def __init__(self,pos,mobilegroup):
+        try:
+            img = [pygame.image.load('graphics/villager01.png').convert_alpha(),pygame.image.load('graphics/villager01_sel.png').convert_alpha()]
+            for a in img:
+                img[a].set_colorkey((255,255,255))
+        except:
+            pass
+        pygame.sprite.Sprite.__init__(self,mobilegroup)
+        self.image = commonfolk.img[0]
         self.rect = self.image.get_rect()
-        self.rect.x = posx
-        self.rect.y = posy
+        self.rect.x = pos[0]
+        self.rect.y = pos[1]
         Unitorg.units.append(self)
         self.target = None
         self.pos = (self.rect[0],self.rect[1])
@@ -38,17 +42,21 @@ class Ball(pygame.sprite.Sprite):
     ## marks a unit as selected if clicked on, and deselects it if you click elsewhere
     def selection(self):
         if self.rect.collidepoint((pygame.mouse.get_pos())):
-            if not self in Ball.selected:
-                Ball.selected.append(self)
-                self.image = Ball.img[1]
-                print(Ball.selected)
+            if not self in commonfolk.selected:
+                commonfolk.selected.append(self)
+                self.image = commonfolk.img[1]
+                print(commonfolk.selected)
             
 
         elif not self.rect.collidepoint((pygame.mouse.get_pos())):
-            if self in Ball.selected:
-                Ball.selected.remove(self)
-                self.image = Ball.img[0]
-                print(Ball.selected)
+            if self in commonfolk.selected:
+                commonfolk.selected.remove(self)
+                self.image = commonfolk.img[0]
+                print(commonfolk.selected)
+                
+                
+class S_object(pygame.sprite.Sprite):
+    s_objectlist = []
 
 
 
@@ -56,7 +64,7 @@ class Ball(pygame.sprite.Sprite):
 
 class config(object):
     screensize = (1920,1080)
-    mapsize = (1024,1024)
+    mapsize = (512,512)
     tilesize = 64
     fps = 30
     scrollstepx = 1
@@ -87,7 +95,7 @@ class spritesheet(object):
     # Load a whole bunch of images and return them as a list
     def images_at(self, rects, colorkey = None):
         "Loads multiple images, supply a list of coordinates" 
-        return [self.image_at(rect, colorkey) for rect in rects]
+        return {a:self.image_at(rect, colorkey) for a,rect in enumerate(rects)}
     # Load a whole strip of images
     def load_strip(self, rect, image_count, colorkey = None):
         "Loads a strip of images and returns them as a list"
@@ -99,7 +107,7 @@ class tiledata(object):
     def __init__(self,data):
         self.data = data
 
-class Town(object):
+class farm(object):
     stuff = "placeholder"  
 
 ##Class to keep track of units created
