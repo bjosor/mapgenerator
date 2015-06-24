@@ -51,7 +51,7 @@ def readhm(image):
         for j in range(imgheight):
             if colormap[i][j] <= 125:
                 tile = 0
-            elif colormap[i][j] <= 190:
+            elif colormap[i][j] <= 255:
                 tile = 1
             elif colormap[i][j] <= 255:
                 tile = 2
@@ -69,10 +69,11 @@ def check_neighbor(array,x,y,tile):
     binary = 0
     #print(x,y)
     if x >= 1 and x <= len(array)-2 and y >= 1 and y <= len(array[0])-2:
-        if array[x][y]["tileval"] == tile:
-            neighbors = [array[x][y+1],array[x+1][y+1],array[x+1][y],array[x+1][y-1],array[x][y-1],array[x-1][y-1],array[x-1][y],array[x-1][y+1]]
+        if array[x][y]["tileval"] == 0:
+            neighbors = [array[x-1][y]["tileval"],array[x][y-1]["tileval"],array[x+1][y]["tileval"],array[x][y+1]["tileval"]]
             for index, a in enumerate(neighbors):
-                if a["tileval"] != tile:
+                if a != tile:
+                    print("a and tile",a,tile)
                     #print("a and tile",a,tile)
                     if index == 0:
                         binary += 1
@@ -82,16 +83,10 @@ def check_neighbor(array,x,y,tile):
                         binary += 4
                     elif index == 3:
                         binary += 8
-                    elif index == 4:
-                        binary += 16
-                    elif index == 5:
-                        binary += 32
-                    elif index == 6:
-                        binary += 64
-                    elif index == 7:
-                        binary += 128
+                    if binary == 15:
+                        print(binary)
                 
-            print(binary)
+    #print(binary)
     return binary
 
 def generate_minimap(tilemap,mapsize):

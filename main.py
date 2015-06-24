@@ -14,7 +14,10 @@ def drawmap(tilearray,surface,focus):
         x += 1
         for b in range(focus[1],focus[1]+int(config.screensize[1]/64)+2):
             y += 1
-            surface.blit(tiletextures[tilearray[a][b]["tileval"]][tilearray[a][b]["tilevar"]],(x*64,y*64))
+            if tilearray[a][b]["tileval"] == 0:
+                surface.blit(tiletextures[tilearray[a][b]["tileval"]][tilearray[a][b]["tilevar"]],(x*64,y*64))
+            if tilearray[a][b]["tileval"] == 1:
+                surface.blit(tiletextures[1][tilearray[a][b]["tilevar"]],(x*64,y*64))
                 
     return surface
             
@@ -59,7 +62,7 @@ minimapcopy=minimap.copy()
 water = spritesheet("graphics/water.png")
 grass = spritesheet("graphics/grass.png")
 rock  = spritesheet("graphics/rock.png")  
-tiletextures = [water.load_strip((0,0,64,64),18,(255,255,255)),grass.load_strip((0,0,64,64),18,(255,255,255)),rock.load_strip((0,0,64,64),18,(255,255,255))] 
+tiletextures = [water.load_strip((0,0,64,64),16,(255,255,255)),grass.load_strip((0,0,64,64),16,(255,255,255)),rock.load_strip((0,0,64,64),18,(255,255,255))] 
 terrain = pygame.Surface((config.screensize[0]+128,config.screensize[1]+128))
 
 clock = pygame.time.Clock()
@@ -69,7 +72,7 @@ config.cornerpoint = [0,0]
 
 allgroup = pygame.sprite.Group()
 
-#villager = commonfolk(startpos,allgroup)
+villager = commonfolk(startpos,allgroup)
 
 
 
@@ -104,15 +107,18 @@ while mainloop:
     # -----------SCROLLING------------------------
         
 
-    
+     
 
     #updates units
     scroll()
     terrain = drawmap(themap,terrain,config.cornerpoint)
     update_minimap(minimap,minimapcopy)
     allgroup.clear(screen, terrain)
+    villager.update(seconds)
+    
     screen.blit(terrain,(-64,-64))
     screen.blit(minimap,(0,0))
+    allgroup.draw(screen)
     
     pygame.display.flip()
 

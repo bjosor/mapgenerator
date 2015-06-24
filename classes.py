@@ -1,41 +1,40 @@
 import pygame, math
 
+
 class commonfolk(pygame.sprite.Sprite):
     m_objectlist = []
     selected = []
+    img = [pygame.image.load('graphics/villager01.png'),pygame.image.load('graphics/villager01_sel.png')]
     ## Contains the base information of the instance
     def __init__(self,pos,mobilegroup):
-        try:
-            img = [pygame.image.load('graphics/villager01.png').convert_alpha(),pygame.image.load('graphics/villager01_sel.png').convert_alpha()]
-            for a in img:
-                img[a].set_colorkey((255,255,255))
-        except:
-            pass
+        #img = [pygame.image.load('graphics/villager01.png'),pygame.image.load('graphics/villager01_sel.png')]
+
         pygame.sprite.Sprite.__init__(self,mobilegroup)
         self.image = commonfolk.img[0]
         self.rect = self.image.get_rect()
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
+        self.pos = pos
+        self.truex = self.pos[0]
+        self.truey = self.pos[1]
+        self.rect.center = (self.truex,self.truey)
         Unitorg.units.append(self)
         self.target = None
-        self.pos = (self.rect[0],self.rect[1])
+        self.speed = 1
+
 
     ##used each frame to update the state of the instance
     def update(self,seconds):
 
         #if a target has been set, move towards it and stop when reached
         if  self.target != None:
-            speed=3
-            dx = self.rect.x - self.target[0]
-            dy = self.rect.y - self.target[1]
-            dz = math.sqrt(dx**2 + dy**2)
-            #print (dz)
-            self.rect.x += (dx/dz*speed)*seconds
-            self.rect.y += (dy/dz*speed)*seconds
-                
-            if self.rect[0] == self.target[0] and self.rect[1] == self.target[1]:
-                self.target = None
+            distance = [self.target[0] - self.truex, self.target[1] - self.truey]
             
+            self.angle = math.atan2(distance[0],distance[1])
+          
+            self.truex += math.sin(self.angle) * self.speed
+            self.truey -= math.cos(self.angle) * self.speed
+            
+            self.rect.center = (round(self.truex),round(self.truey))
+
 
             
 
@@ -98,9 +97,14 @@ class spritesheet(object):
         return {a:self.image_at(rect, colorkey) for a,rect in enumerate(rects)}
     # Load a whole strip of images
     def load_strip(self, rect, image_count, colorkey = None):
+        tups = []
+        for x in range(image_count):
+            tups.append((rect[0]+rect[2]*x, rect[1], rect[2], rect[3]))
+        for x in range(image_count):
+            tups.append(((rect[0]+64)+rect[2]*x, rect[1], rect[2], rect[3]))
         "Loads a strip of images and returns them as a list"
-        tups = [(rect[0]+rect[2]*x, rect[1], rect[2], rect[3])
-                for x in range(image_count)]
+        #tups = [(rect[0]+rect[2]*x, rect[1], rect[2], rect[3])
+        #       for x in range(image_count)]
         return self.images_at(tups, colorkey)
 
 class tiledata(object):
