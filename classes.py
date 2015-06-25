@@ -1,5 +1,19 @@
 import pygame, math
 
+def screen_to_array(screen_coords):
+    #takes a coordinate tuple and converts it from screen coords to array coords
+    screen_coords = list(screen_coords)
+    screen_coords[0] = (screen_coords[0]/64) + config.cornerpoint[0]
+    screen_coords[1] = (screen_coords[1]/64) + config.cornerpoint[1]
+    return tuple(screen_coords)
+
+def array_to_screen(array_coords):
+    #takes a coordinate tuple and converts it from array coords to screen coords
+    array_coords = list(array_coords)
+    array_coords[0] = array_coords[0]*64 - config.cornerpoint[0]*64
+    array_coords[1] = array_coords[1]*64 - config.cornerpoint[1]*64
+    return tuple(array_coords)
+
 
 class commonfolk(pygame.sprite.Sprite):
     m_objectlist = []
@@ -12,28 +26,37 @@ class commonfolk(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self,mobilegroup)
         self.image = commonfolk.img[0]
         self.rect = self.image.get_rect()
-        self.pos = pos
-        self.truex = self.pos[0]
-        self.truey = self.pos[1]
-        self.rect.center = (self.truex,self.truey)
+        self.trueX = pos[0]
+        self.trueY = pos[1]
+        self.rect.center = (self.trueX,self.trueY)
         Unitorg.units.append(self)
         self.target = None
-        self.speed = 1
+        self.speed = 5
 
 
     ##used each frame to update the state of the instance
     def update(self,seconds):
+        self.rect.center = array_to_screen((self.trueX,self.trueY))
 
         #if a target has been set, move towards it and stop when reached
         if  self.target != None:
-            distance = [self.target[0] - self.truex, self.target[1] - self.truey]
-            
-            self.angle = math.atan2(distance[0],distance[1])
+            deltaX = self.target[0] - self.trueX
+            deltaY = self.target[1] - self.trueY
+            distance = math.sqrt(deltaX * deltaX + deltaY * deltaY)
+            deltaX /= distance
+            deltaY /= distance
           
-            self.truex += math.sin(self.angle) * self.speed
-            self.truey -= math.cos(self.angle) * self.speed
+            self.trueX += self.speed * deltaX * seconds
+            self.trueY += self.speed * deltaY * seconds
             
-            self.rect.center = (round(self.truex),round(self.truey))
+            self.rect.center = array_to_screen((self.trueX,self.trueY))
+            
+            array_rectcoords = screen_to_array(self.rect.center)
+            
+            if array_rectcoords[0]-0.1 <= self.target[0] < array_rectcoords[0]+0.1:
+                if array_rectcoords[1]-0.1 <= self.target[1] < array_rectcoords[1]+0.1:
+                    self.rect.center = array_to_screen(self.target)
+                    self.target = None
 
 
             
@@ -56,8 +79,17 @@ class commonfolk(pygame.sprite.Sprite):
                 
 class S_object(pygame.sprite.Sprite):
     s_objectlist = []
+    selected = []
+    def __init__(self,pos,mobilegroup):
+        #img = [pygame.image.load('graphics/villager01.png'),pygame.image.load('graphics/villager01_sel.png')]
 
-
+        pygame.sprite.Sprite.__init__(self,mobilegroup)
+        self.image = commonfolk.img[0]
+        self.rect = self.image.get_rect()
+        self.trueX = pos[0]
+        self.trueY = pos[1]
+        self.rect.center = (self.trueX,self.trueY)
+        Unitorg.units.append(self)
 
 
 

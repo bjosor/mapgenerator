@@ -2,6 +2,13 @@ import pygame, random, math
 
 pygame.init()
 
+def arrayblur(array):
+    for a in range(1,len(array)-1):
+        for b in range(1,len(array[0])-1):
+            array[a][b] = array[a-1][b] + array[a][b-1] + array[a+1][b] + array[a][b+1] + array[a][b] + array[a][b]
+            array[a][b] = array[a][b]/6
+    return array
+
 
 def diamondsquaredmap(x,y,width,height,iterations):
     dsmap = fieldDiamondSquared(x, y, x+width, y+height, iterations)
@@ -129,6 +136,7 @@ def PRH(iterations,x,y):
 
 def paint(seedx,seedy,width,height,iterations):
     dsmap = diamondsquaredmap(seedx, seedy, width, height, iterations)
+    dsmap = arrayblur(dsmap)
     surface = pygame.Surface((width,height))
     for j in range(len(dsmap)):
         for k in range(len(dsmap[1])):

@@ -1,4 +1,4 @@
-import pygame, sys, math, random, Diamondsquaregen
+import pygame, sys, math, random, Diamondsquaregen, olsennoise
 
 ##-----------CLASSES--------------------
         
@@ -49,7 +49,7 @@ def readhm(image):
     # exchange color value for corresponding tile ID
     for i in range(imgwidth):
         for j in range(imgheight):
-            if colormap[i][j] <= 125:
+            if colormap[i][j] <= 120:
                 tile = 0
             elif colormap[i][j] <= 255:
                 tile = 1
@@ -73,7 +73,6 @@ def check_neighbor(array,x,y,tile):
             neighbors = [array[x-1][y]["tileval"],array[x][y-1]["tileval"],array[x+1][y]["tileval"],array[x][y+1]["tileval"]]
             for index, a in enumerate(neighbors):
                 if a != tile:
-                    print("a and tile",a,tile)
                     #print("a and tile",a,tile)
                     if index == 0:
                         binary += 1
@@ -82,10 +81,7 @@ def check_neighbor(array,x,y,tile):
                     elif index == 2:
                         binary += 4
                     elif index == 3:
-                        binary += 8
-                    if binary == 15:
-                        print(binary)
-                
+                        binary += 8               
     #print(binary)
     return binary
 
@@ -107,7 +103,7 @@ def generate_minimap(tilemap,mapsize):
 
 
 def generate_map(seed,mapsize):   
-    image = Diamondsquaregen.paint(seed,seed,mapsize[0],mapsize[1],5).convert()
+    image = Diamondsquaregen.paint(seed,seed,mapsize[0],mapsize[1],6)
     
     tilemap = readhm(image)
     minimap = generate_minimap(tilemap,mapsize)

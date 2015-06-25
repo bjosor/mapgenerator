@@ -2,6 +2,21 @@ import pygame, math, sys, random, mapgen
 from classes import *
 from pygame.constants import FULLSCREEN
 
+def screen_to_array(screen_coords):
+    #takes a coordinate tuple and converts it from screen coords to array coords
+    screen_coords = list(screen_coords)
+    screen_coords[0] = (screen_coords[0]/64) + config.cornerpoint[0]
+    screen_coords[1] = (screen_coords[1]/64) + config.cornerpoint[1]
+    return tuple(screen_coords)
+
+def array_to_screen(array_coords):
+    #takes a coordinate tuple and converts it from array coords to screen coords
+    array_coords = list(array_coords)
+    array_coords[0] = array_coords[0]*64 - config.cornerpoint[0]*64
+    array_coords[1] = array_coords[1]*64 - config.cornerpoint[1]*64
+    return tuple(array_coords)
+    
+
 def update_minimap(minimap,copy):
     minimap.blit(copy,(0,0))
     screenpos = pygame.Rect(config.cornerpoint[0], config.cornerpoint[1], int(config.screensize[0]/64), int(config.screensize[1]/64))
@@ -56,7 +71,7 @@ pygame.init()
 screen = pygame.display.set_mode((config.screensize[0], config.screensize[1]), FULLSCREEN)
 
 #-----------------Get maparray, load gfx and prepare surfaces ---------------------
-themap,minimap = mapgen.generate_map(random.randint(1,100000),(config.mapsize[0],config.mapsize[1]))
+themap,minimap = mapgen.generate_map(random.randint(1,1000000),(config.mapsize[0],config.mapsize[1]))
 minimapcopy=minimap.copy()
 
 water = spritesheet("graphics/water.png")
@@ -66,7 +81,7 @@ tiletextures = [water.load_strip((0,0,64,64),16,(255,255,255)),grass.load_strip(
 terrain = pygame.Surface((config.screensize[0]+128,config.screensize[1]+128))
 
 clock = pygame.time.Clock()
-startpos = (random.randint(1,config.mapsize[0]),random.randint(1,config.mapsize[1]))
+startpos = (10,10)
 
 config.cornerpoint = [0,0]
 
@@ -101,6 +116,7 @@ while mainloop:
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
             for i in commonfolk.selected:
                 i.target = pygame.mouse.get_pos()
+                i.target = screen_to_array(i.target)
                 
 
 
