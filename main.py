@@ -17,24 +17,35 @@ def array_to_screen(array_coords):
     return tuple(array_coords)
     
 
-def update_minimap(minimap,copy):
+def update_map(minimap,copy,tilearray,focus,tilegroup):
     minimap.blit(copy,(0,0))
-    screenpos = pygame.Rect(config.cornerpoint[0], config.cornerpoint[1], int(config.screensize[0]/64), int(config.screensize[1]/64))
+    screenpos = pygame.Rect(focus[0], focus[1], int(config.screensize[0]/64), int(config.screensize[1]/64))
     pygame.draw.rect(minimap,(255,255,255),screenpos,1)
-
-def drawmap(tilearray,surface,focus):
+    
+    tilegroup.empty()
     x = -1
-    for a in range(focus[0],focus[0]+int(config.screensize[0]/64)+2):
+    for a in range(focus[0],focus[0]+int(config.screensize[0]/64)):
         y = -1
         x += 1
-        for b in range(focus[1],focus[1]+int(config.screensize[1]/64)+2):
+        for b in range(focus[1],focus[1]+int(config.screensize[1]/64)):
             y += 1
-            if tilearray[a][b]["tileval"] == 0:
-                surface.blit(tiletextures[tilearray[a][b]["tileval"]][tilearray[a][b]["tilevar"]],(x*64,y*64))
-            if tilearray[a][b]["tileval"] == 1:
-                surface.blit(tiletextures[1][tilearray[a][b]["tilevar"]],(x*64,y*64))
-                
-    return surface
+            tilearray[a][b].rect.topleft = (x*64,y*64)
+            tilegroup.add(tilearray[a][b])
+            
+    return tilegroup
+            
+    
+    
+
+def init_map(tilearray,tiletextures):
+    for a in range(len(tilearray)):
+        for b in range(len(tilearray[0])):
+            tiletype = tilearray[a][b]
+            tilearray[a][b] = maptile((a,b),tiletype)
+            
+    for a in range(len(tilearray)):
+        for b in range(len(tilearray[0])):
+            tilearray[a][b].init_transition(tilearray,tiletextures)
             
 def scroll():
     scrollx = 0
@@ -77,7 +88,7 @@ minimapcopy=minimap.copy()
 water = spritesheet("graphics/water.png")
 grass = spritesheet("graphics/grass.png")
 rock  = spritesheet("graphics/rock.png")  
-tiletextures = [water.load_strip((0,0,64,64),16,(255,255,255)),grass.load_strip((0,0,64,64),16,(255,255,255)),rock.load_strip((0,0,64,64),18,(255,255,255))] 
+tiletextures = [water.load_strip((0,0,64,64),10,27,(255,255,255)),grass.load_strip((0,0,64,64),10,27,(255,255,255)),rock.load_strip((0,0,64,64),10,27,(255,255,255))] 
 terrain = pygame.Surface((config.screensize[0]+128,config.screensize[1]+128))
 
 clock = pygame.time.Clock()
@@ -86,7 +97,9 @@ startpos = (10,10)
 config.cornerpoint = [0,0]
 
 allgroup = pygame.sprite.Group()
+tilegroup = pygame.sprite.Group()
 
+init_map(themap,tiletextures)
 villager = commonfolk(startpos,allgroup)
 
 
@@ -120,21 +133,17 @@ while mainloop:
                 
 
 
-    # -----------SCROLLING------------------------
         
 
      
 
-    #updates units
+
     scroll()
-    terrain = drawmap(themap,terrain,config.cornerpoint)
-    update_minimap(minimap,minimapcopy)
-    allgroup.clear(screen, terrain)
+    tilegroup = update_map(minimap,minimapcopy,themap,config.cornerpoint,tilegroup)
+    tilegroup.draw(screen)
     villager.update(seconds)
-    
-    screen.blit(terrain,(-64,-64))
-    screen.blit(minimap,(0,0))
     allgroup.draw(screen)
+    screen.blit(minimap,(0,0))
     
     pygame.display.flip()
 

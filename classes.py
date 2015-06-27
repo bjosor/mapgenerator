@@ -1,4 +1,5 @@
-import pygame, math
+import pygame, math, random
+from operator import pos
 
 def screen_to_array(screen_coords):
     #takes a coordinate tuple and converts it from screen coords to array coords
@@ -13,6 +14,52 @@ def array_to_screen(array_coords):
     array_coords[0] = array_coords[0]*64 - config.cornerpoint[0]*64
     array_coords[1] = array_coords[1]*64 - config.cornerpoint[1]*64
     return tuple(array_coords)
+
+class maptile(pygame.sprite.Sprite):
+    
+    def __init__(self, pos, tiletype):
+        pygame.sprite.Sprite.__init__(self)
+        self.type = tiletype
+        self.binary = 0
+        self.neighbors = []
+        self.pos = pos
+        
+            
+            
+    
+    def init_transition(self,array,textures):
+        try:
+            self.neighbors = [array[self.pos[0]-1][self.pos[1]-1],array[self.pos[0]][self.pos[1]-1],array[self.pos[0]+1][self.pos[1]-1],array[self.pos[0]+1][self.pos[1]],array[self.pos[0]+1][self.pos[1]+1],array[self.pos[0]][self.pos[1]+1],array[self.pos[0]-1][self.pos[1]+1],array[self.pos[0]-1][self.pos[1]]]
+        except:
+            print("error! Probably not a problem :D")
+        for index,a in enumerate(self.neighbors):
+            
+            if a.type == self.type-1:
+                if index == 0:
+                    self.binary += 1
+                elif index == 1:
+                    self.binary += 2
+                elif index == 2:
+                    self.binary += 4
+                elif index == 3:
+                    self.binary += 8 
+                elif index == 4:
+                    self.binary += 16
+                elif index == 5:
+                    self.binary += 32
+                elif index == 6:
+                    self.binary += 64
+                elif index == 7:
+                    self.binary += 128
+        if self.binary == 0:
+            self.image = textures[self.type][random.randint(0,9)]
+        else:
+            print(self.binary+9)
+            self.image = textures[self.type][self.binary+9]
+        self.rect = self.image.get_rect()
+        
+            
+        
 
 
 class commonfolk(pygame.sprite.Sprite):
@@ -112,6 +159,7 @@ class spritesheet(object):
             self.sheet = pygame.image.load(filename).convert()
         except pygame.error:
             print ('Unable to load spritesheet image:')
+            assert False
     # Load a specific image from a specific rectangle
     def image_at(self, rectangle, colorkey = None):
         "Loads image from x,y,x+offset,y+offset"
@@ -128,12 +176,14 @@ class spritesheet(object):
         "Loads multiple images, supply a list of coordinates" 
         return {a:self.image_at(rect, colorkey) for a,rect in enumerate(rects)}
     # Load a whole strip of images
-    def load_strip(self, rect, image_count, colorkey = None):
+    def load_strip(self, rect, image_count, rows, colorkey = None ):
         tups = []
         for x in range(image_count):
             tups.append((rect[0]+rect[2]*x, rect[1], rect[2], rect[3]))
-        for x in range(image_count):
-            tups.append(((rect[0]+64)+rect[2]*x, rect[1], rect[2], rect[3]))
+        if rows != 0:
+            for y in range(1,rows):
+                for x in range(image_count):
+                    tups.append((rect[0]+rect[2]*x, rect[1]+rect[3]*y, rect[2], rect[3]))
         "Loads a strip of images and returns them as a list"
         #tups = [(rect[0]+rect[2]*x, rect[1], rect[2], rect[3])
         #       for x in range(image_count)]

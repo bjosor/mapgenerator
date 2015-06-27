@@ -137,19 +137,9 @@ def PRH(iterations,x,y):
 def paint(seedx,seedy,width,height,iterations):
     dsmap = diamondsquaredmap(seedx, seedy, width, height, iterations)
     dsmap = arrayblur(dsmap)
-    surface = pygame.Surface((width,height))
-    for j in range(len(dsmap)):
-        for k in range(len(dsmap[1])):
-            color = abs(math.floor(dsmap[j][k]*250))
-            if color > 255:
-                color = 255
-            color -= 10
-            if color < 0:
-                color = 0
-            #print(color)
-
-            surface.set_at((j,k),(color,color,color))
-    return surface
+    
+    return dsmap
+    
 
 #screen = pygame.display.set_mode((512,512))
 #background = paint(512,512,5)
