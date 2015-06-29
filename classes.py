@@ -16,6 +16,7 @@ def array_to_screen(array_coords):
     return tuple(array_coords)
 
 class maptile(pygame.sprite.Sprite):
+    walkables = [1]
     
     def __init__(self, pos, tiletype):
         pygame.sprite.Sprite.__init__(self)
@@ -23,7 +24,9 @@ class maptile(pygame.sprite.Sprite):
         self.binary = 0
         self.neighbors = []
         self.pos = pos
-        
+        self.walkable = False
+        if self.type in maptile.walkables:
+            self.walkable = True
             
             
     
@@ -31,7 +34,7 @@ class maptile(pygame.sprite.Sprite):
         try:
             self.neighbors = [array[self.pos[0]-1][self.pos[1]-1],array[self.pos[0]][self.pos[1]-1],array[self.pos[0]+1][self.pos[1]-1],array[self.pos[0]+1][self.pos[1]],array[self.pos[0]+1][self.pos[1]+1],array[self.pos[0]][self.pos[1]+1],array[self.pos[0]-1][self.pos[1]+1],array[self.pos[0]-1][self.pos[1]]]
         except:
-            print("error! Probably not a problem :D")
+            print("error! bordertile troubles, fix at later date :D")
         for index,a in enumerate(self.neighbors):
             
             if a.type == self.type-1:
@@ -67,7 +70,7 @@ class commonfolk(pygame.sprite.Sprite):
     selected = []
     img = [pygame.image.load('graphics/villager01.png'),pygame.image.load('graphics/villager01_sel.png')]
     ## Contains the base information of the instance
-    def __init__(self,pos,mobilegroup):
+    def __init__(self,pos,mobilegroup,pop):
         #img = [pygame.image.load('graphics/villager01.png'),pygame.image.load('graphics/villager01_sel.png')]
 
         pygame.sprite.Sprite.__init__(self,mobilegroup)
@@ -79,10 +82,12 @@ class commonfolk(pygame.sprite.Sprite):
         Unitorg.units.append(self)
         self.target = None
         self.speed = 5
+        self.is_landbased = 1
+        self.group_population = pop
 
 
     ##used each frame to update the state of the instance
-    def update(self,seconds):
+    def update(self,seconds,walkables):
         self.rect.center = array_to_screen((self.trueX,self.trueY))
 
         #if a target has been set, move towards it and stop when reached
@@ -98,11 +103,16 @@ class commonfolk(pygame.sprite.Sprite):
             
             self.rect.center = array_to_screen((self.trueX,self.trueY))
             
+            
             array_rectcoords = screen_to_array(self.rect.center)
             
             if array_rectcoords[0]-0.1 <= self.target[0] < array_rectcoords[0]+0.1:
                 if array_rectcoords[1]-0.1 <= self.target[1] < array_rectcoords[1]+0.1:
                     self.rect.center = array_to_screen(self.target)
+                    self.target = None
+            
+            for a in walkables:
+                if pygame.sprite.collide_rect(a,self):
                     self.target = None
 
 

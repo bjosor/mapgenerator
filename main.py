@@ -23,6 +23,7 @@ def update_map(minimap,copy,tilearray,focus,tilegroup):
     pygame.draw.rect(minimap,(255,255,255),screenpos,1)
     
     tilegroup.empty()
+    walkables.empty()
     x = -1
     for a in range(focus[0],focus[0]+int(config.screensize[0]/64)):
         y = -1
@@ -31,6 +32,9 @@ def update_map(minimap,copy,tilearray,focus,tilegroup):
             y += 1
             tilearray[a][b].rect.topleft = (x*64,y*64)
             tilegroup.add(tilearray[a][b])
+            if tilearray[a][b].walkable == False:
+                walkables.add(tilearray[a][b])
+            
             
     return tilegroup
             
@@ -98,9 +102,10 @@ config.cornerpoint = [0,0]
 
 allgroup = pygame.sprite.Group()
 tilegroup = pygame.sprite.Group()
+walkables = pygame.sprite.Group()
 
 init_map(themap,tiletextures)
-villager = commonfolk(startpos,allgroup)
+villager = commonfolk(startpos,allgroup,100)
 
 
 
@@ -141,7 +146,7 @@ while mainloop:
     scroll()
     tilegroup = update_map(minimap,minimapcopy,themap,config.cornerpoint,tilegroup)
     tilegroup.draw(screen)
-    villager.update(seconds)
+    villager.update(seconds,walkables)
     allgroup.draw(screen)
     screen.blit(minimap,(0,0))
     
